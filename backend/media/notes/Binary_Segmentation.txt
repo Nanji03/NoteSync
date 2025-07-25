@@ -1,0 +1,132 @@
+Binary Segmentation: If there is only one class your segmenting (e.g. segmenting a brain tumor in an MRI scan), then the output of the model only needs to be (512x512). For the mask, each pixel will contain a “1” if that pixel belongs to a tumor, or “0” if that pixel does not belong to a tumor. Make sure to also change “softmax” to “sigmoid” in the final activation of the model, and use the (Focal) Binary Cross Entropy loss function.
+
+Class Imbalance: Often in image segmentation, there is severe class imbalance. For example, in an average street view image, cars and buildings take up a lot of pixels, but stop signs take up very few pixels. The model has less data on stop signs, so it will perform poorly in segmenting stop signs. To solve this, you can use Focal Categorical Cross Entropy and class weights, which place emphasis on minority classes.
+
+Fine-tuning **Mask2Former** involves adapting a pre-trained Mask2Former model to perform well on a specific dataset or task. This process leverages transfer learning, where the model has already learned useful features from large datasets and can be adapted with a smaller amount of task-specific data. Here’s a step-by-step guide to fine-tuning Mask2Former:
+
+### 1. Set Up the Environment
+
+To start, make sure you have the required libraries:
+- **PyTorch**
+- **Detectron2** (Mask2Former is implemented within the Detectron2 framework by Facebook AI)
+  
+Install Detectron2 and Mask2Former:
+```bash
+pip install torch torchvision
+python -m pip install 'git+https://github.com/facebookresearch/detectron2.git'
+git clone https://github.com/facebookresearch/Mask2Former.git
+cd Mask2Former
+pip install -e .
+```
+
+### 2. Load a Pre-trained Mask2Former Model
+
+Load a pre-trained model on a similar task (e.g., COCO dataset) and prepare it for fine-tuning.
+
+```python
+import torch
+from detectron2.config import get_cfg
+from detectron2.engine import DefaultTrainer, DefaultPredictor
+from detectron2.data import DatasetCatalog, MetadataCatalog
+from detectron2.data.datasets import register_coco_instances
+from mask2former import add_maskformer2_config
+
+# Set up configuration
+cfg = get_cfg()
+add_maskformer2_config(cfg)
+cfg.merge_from_file("path/to/mask2former/config/file.yaml")  # use a Mask2Former config file
+cfg.MODEL.WEIGHTS = "path/to/pretrained/model.pth"  # path to pretrained weights
+
+# Set up device
+cfg.MODEL.DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+```
+
+### 3. Prepare the Dataset
+
+Register your dataset in Detectron2 format. Mask2Former supports COCO-style annotations for segmentation tasks. To register your dataset, use:
+```python
+# Example for registering a dataset in COCO format
+register_coco_instances("my_dataset_train", {}, "path/to/train/annotations.json", "path/to/train/images")
+register_coco_instances("my_dataset_val", {}, "path/to/val/annotations.json", "path/to/val/images")
+
+# Load the metadata
+train_metadata = MetadataCatalog.get("my_dataset_train")
+val_metadata = MetadataCatalog.get("my_dataset_val")
+```
+
+### 4. Configure the Model for Fine-tuning
+
+Set model hyperparameters like learning rate, batch size, number of classes, and the output directory.
+
+```python
+cfg.DATASETS.TRAIN = ("my_dataset_train",)
+cfg.DATASETS.TEST = ("my_dataset_val",)
+cfg.DATALOADER.NUM_WORKERS = 2
+
+# Update number of classes based on your dataset
+cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = number_of_classes  # number_of_classes is specific to your dataset
+cfg.SOLVER.IMS_PER_BATCH = 4  # Adjust according to your GPU memory
+cfg.SOLVER.BASE_LR = 0.0001  # Lower learning rate for fine-tuning
+cfg.SOLVER.MAX_ITER = 5000  # Number of iterations; adjust based on dataset size
+cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128
+cfg.MODEL.ROI_HEADS.NUM_CLASSES = number_of_classes
+
+# Set the output directory
+cfg.OUTPUT_DIR = "./output/mask2former_finetuned"
+```
+
+### 5. Train the Model
+
+Set up the training loop using Detectron2’s `DefaultTrainer` and start training.
+
+```python
+import os
+from detectron2.engine import DefaultTrainer
+
+os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
+trainer = DefaultTrainer(cfg)
+trainer.resume_or_load(resume=False)
+trainer.train()
+```
+
+### 6. Evaluate the Fine-tuned Model
+
+After training, evaluate the model on the validation set to measure its performance.
+
+```python
+from detectron2.evaluation import COCOEvaluator, inference_on_dataset
+from detectron2.data import build_detection_test_loader
+
+evaluator = COCOEvaluator("my_dataset_val", cfg, False, output_dir="./output/")
+val_loader = build_detection_test_loader(cfg, "my_dataset_val")
+inference_on_dataset(trainer.model, val_loader, evaluator)
+```
+
+### 7. Use the Fine-tuned Model for Predictions
+
+You can use the `DefaultPredictor` class to make predictions with the fine-tuned model.
+
+```python
+from detectron2.utils.visualizer import Visualizer
+from detectron2.data import MetadataCatalog
+import cv2
+
+predictor = DefaultPredictor(cfg)
+image = cv2.imread("path/to/image.jpg")
+outputs = predictor(image)
+
+# Visualize the results
+v = Visualizer(image[:, :, ::-1], metadata=val_metadata, scale=0.5)
+v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+cv2.imshow("Result", v.get_image()[:, :, ::-1])
+cv2.waitKey(0)
+```
+
+### Tips for Fine-tuning Mask2Former
+
+1. **Learning Rate**: Lower learning rates (e.g., `0.0001` or `0.00001`) are generally better for fine-tuning, as they prevent overwriting learned features.
+2. **Batch Size**: If you have limited GPU memory, reduce the batch size and increase `MAX_ITER` accordingly.
+3. **Data Augmentation**: Apply data augmentations like flipping, resizing, and rotation to improve model robustness, especially if you have a smaller dataset.
+4. **Early Stopping**: Monitor validation loss and stop training early if overfitting is observed.
+
+This setup fine-tunes Mask2Former to perform well on your custom dataset. Experimenting with parameters like learning rate and batch size, as well as using effective augmentation strategies, can significantly improve model performance.
