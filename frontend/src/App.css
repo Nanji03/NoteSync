@@ -1,0 +1,113 @@
+@font-face {
+  font-family: 'Pricedown';
+  src: url('./assets/fonts/Pricedown.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  font-family: 'Pricedown', sans-serif;
+  background-color: #1a1a1a; /* gtaBlack */
+  color: #ecf0f1; /* gtaWhite */
+  /* background-image: url('/images/gta-background.jpg');  */
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  font-family: 'Pricedown', sans-serif;
+  text-shadow: 2px 2px 0 #000;
+}
+
+button {
+  background-color: #2ecc71; /* gtaGreen */
+  color: #1a1a1a; /* gtaBlack */
+  padding: 0.75rem 1.5rem;
+  border: none;
+  font-family: 'Pricedown', sans-serif;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); /* gta box shadow */
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #00ffcc; /* gtaAccent */
+  color: #000;
+  transform: scale(1.05);
+}
+
+.typing-animation::after {
+  content: "|";
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1 }
+  50% { opacity: 0 }
+}
+
+.gta-dialog-box {
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 2px solid #f1c40f;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+  font-size: 1.2rem;
+}
+
+.gta-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.gta-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #2ecc71;
+  border-radius: 4px;
+}
+.gta-scrollbar::-webkit-scrollbar-track {
+  background-color: #1a1a1a;
+}
+
+/* GTA Dark Theme for react-calendar */
+.react-calendar {
+  background-color: #1a1a1a;
+  color: #ecf0f1;
+  border: 2px solid #00ffcc;
+  border-radius: 10px;
+  font-family: 'Pricedown', sans-serif;
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+  padding: 1rem;
+}
+
+.react-calendar__navigation button {
+  background: none;
+  color: #00ffcc;
+  font-weight: bold;
+}
+
+.react-calendar__tile {
+  background: transparent;
+  color: #ecf0f1;
+  border-radius: 6px;
+}
+
+.react-calendar__tile--now {
+  background: #2ecc71;
+  color: #1a1a1a;
+}
+
+.react-calendar__tile--active {
+  background: #00ffcc !important;
+  color: #000 !important;
+}
+
+.react-calendar__tile:hover {
+  background-color: #00ffcc22;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.react-calendar__month-view__days__day--weekend {
+  color: #e74c3c;
+}
