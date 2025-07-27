@@ -40,7 +40,7 @@ export default function Login() {
     <AuthFormWrapper title="🔑 Login to NoteSync">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm mb-1 text-gtaGreen font-bold">Username</label>
+          <label className="block text-lg mb-2 text-gtaAccent font-bold">Username</label>
           <input
             type="text"
             name="username"
@@ -51,7 +51,7 @@ export default function Login() {
           />
         </div>
         <div>
-          <label className="block text-sm mb-1 text-gtaGreen font-bold">Password</label>
+          <label className="block text-lg mb-2 text-gtaAccent font-bold">Password</label>
           <input
             type="password"
             name="password"
@@ -63,7 +63,7 @@ export default function Login() {
         </div>
         <button 
           type="submit"
-          className="w-full py-2 bg-gtaGreen text-gtaBlack font-bold rounded shadow-gta hover:scale-105 transition-all"
+          className="w-full py-2 bg-gtaAccent text-gtaBlack font-bold rounded shadow-gta hover:scale-105 transition-all"
         >
           🚪 Login
         </button>

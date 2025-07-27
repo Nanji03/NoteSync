@@ -42,67 +42,63 @@ export default function Register() {
 
   return (
     <AuthFormWrapper title="📝 Sign Up for NoteSync">
-      <form onSubmit={handleSubmit} className="space-y-4 text-white font-gta">
-        <div className="border-2 border-yellow-400 rounded-xl p-3 shadow-gta-box">
-          <label className="block text-sm mb-1 uppercase tracking-widest">Username</label>
-          <input
-            type="text"
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-700 rounded-md bg-black text-white focus:ring-2 focus:ring-yellow-400 shadow-inner"
-            required
-          />
-        </div>
-        <div className="border-2 border-yellow-400 rounded-xl p-3 shadow-gta-box">
-          <label className="block text-sm mb-1 uppercase tracking-widest">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-700 rounded-md bg-black text-white focus:ring-2 focus:ring-yellow-400 shadow-inner"
-            required
-          />
-        </div>
-        <div className="border-2 border-yellow-400 rounded-xl p-3 shadow-gta-box">
-          <label className="block text-sm mb-1 uppercase tracking-widest">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-700 rounded-md bg-black text-white focus:ring-2 focus:ring-yellow-400 shadow-inner"
-            required
-          />
-        </div>
-        <div className="border-2 border-yellow-400 rounded-xl p-3 shadow-gta-box">
-          <label className="block text-sm mb-1 uppercase tracking-widest">Confirm Password</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-700 rounded-md bg-black text-white focus:ring-2 focus:ring-yellow-400 shadow-inner"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full py-2 bg-yellow-500 text-black font-bold rounded hover:bg-yellow-400 transition-all flex items-center justify-center gap-2 shadow-gta-btn"
-        >
-          <FaUserPlus /> Register
-        </button>
-        <p className="text-sm text-center mt-4">
-          Already have an account?{" "}
-          <a
-            href="/login"
-            className="text-yellow-300 underline hover:text-yellow-200 transition-all"
-          >
-            Head to login 🚗
-          </a>
-        </p>
-      </form>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+    <label className="block text-lg mb-1 text-gtaAccent font-bold">Username</label>
+    <input
+      type="text"
+      name="username"
+      value={form.username}
+      onChange={handleChange}
+      className="w-full px-4 py-2 bg-gtaBlack text-gtaWhite border border-gtaAccent rounded shadow-gta"
+      required
+    />
+  </div>
+  <div>
+    <label className="block text-lg mb-1 text-gtaAccent font-bold">Email</label>
+    <input
+      type="email"
+      name="email"
+      value={form.email}
+      onChange={handleChange}
+      className="w-full px-4 py-2 bg-gtaBlack text-gtaWhite border border-gtaAccent rounded shadow-gta"
+      required
+    />
+  </div>
+  <div>
+    <label className="block text-lg mb-1 text-gtaAccent font-bold">Password</label>
+    <input
+      type="password"
+      name="password"
+      value={form.password}
+      onChange={handleChange}
+      className="w-full px-4 py-2 bg-gtaBlack text-gtaWhite border border-gtaAccent rounded shadow-gta"
+      required
+    />
+  </div>
+  <div>
+    <label className="block text-lg mb-1 text-gtaAccent font-bold">Confirm Password</label>
+    <input
+      type="password"
+      name="confirmPassword"
+      value={form.confirmPassword}
+      onChange={handleChange}
+      className="w-full px-4 py-2 bg-gtaBlack text-gtaWhite border border-gtaAccent rounded shadow-gta"
+      required
+    />
+  </div>
+  <button
+    type="submit"
+    className="w-full py-2 bg-gtaAccent text-gtaBlack font-bold rounded shadow-gta hover:scale-105 transition-all"
+  >
+    📝 Register
+  </button>
+  <p className="text-sm text-center mt-4 text-gtaWhite/60">
+    Already have an account?{' '}
+    <a href="/login" className="text-gtaAccent hover:underline">Head to login</a>
+  </p>
+</form>
+
     </AuthFormWrapper>
   );
 }

@@ -46,14 +46,22 @@ export default function CharacterSelect() {
         {characters.map((char) => (
           <motion.div
             key={char.id}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: 80 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: char.id === 'cj' ? 0.1 : char.id === 'professor' ? 0.2 : 0.3 }}
+            whileHover={
+              char.id === 'cj'
+                ? { scale: 1.05, rotate: [0, 2, -2, 2, 0] }
+                : char.id === 'professor'
+                ? { scale: 1.05, boxShadow: "0 0 20px #FFD700" }
+                : { y: [0, -5, 0], transition: { duration: 0.4, repeat: Infinity } }
+            }
             className="bg-gtaBlack border border-gtaAccent p-6 rounded-lg shadow-gta text-center cursor-pointer hover:border-gtaGreen transition-all"
             onClick={() => handleSelect(char.id)}
           >
             <div className="text-6xl mb-2">{char.emoji}</div>
             <h2 className="text-2xl text-gtaAccent font-gta mb-1">{char.name}</h2>
-            <p className="text-sm text-gtaGreen font-bold mb-2">{char.role}</p>
+            <p className="text-m text-gtaWhite font-bold mb-2">{char.role}</p>
             <p className="text-gtaWhite/70 text-sm">{char.description}</p>
           </motion.div>
         ))}

@@ -85,6 +85,13 @@ export default function Dashboard() {
             </Link>
             <p className="text-sm text-gtaWhite">Ask your personal AI fixer for help anytime.</p>
           </li>
+
+          <li className="bg-gtaBlack border border-blue-500 p-4 rounded shadow-gta hover:scale-105 transition">
+  <Link to="/quiz" className="text-blue-300 text-xl font-bold hover:underline">
+    🎯 Quiz Mission
+  </Link>
+  <p className="text-sm text-gtaWhite">Test your knowledge with AI-powered challenges.</p>
+</li>
         </ul>
       </div>
     </div>

@@ -1,0 +1,12 @@
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px #facc15, 0 0 20px #facc15;
+  }
+  50% {
+    box-shadow: 0 0 25px #facc15, 0 0 40px #facc15;
+  }
+}
+
+.animate-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}

@@ -47,3 +47,9 @@ class AITutorEntry(models.Model):
         return f"{self.user.username} - {self.question[:40]}"
 
 
+class ConversationSet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    messages = models.JSONField()  # List of {"sender": "user"/"ai", "text": "..."}
+    created_at = models.DateTimeField(auto_now_add=True)
+

@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.shortcuts import render
 
 # Create your views here.
@@ -8,8 +9,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import Note, ShareRequest, Flashcard, FlashcardSet, AITutorEntry
-from .serializers import NoteSerializer, ShareRequestSerializer, FlashcardSerializer, FlashcardSetSerializer, AITutorEntrySerializer
+from .models import Note, ShareRequest, Flashcard, FlashcardSet, AITutorEntry, ConversationSet
+from .serializers import NoteSerializer, ShareRequestSerializer, FlashcardSerializer, FlashcardSetSerializer, AITutorEntrySerializer, ConversationSetSerializer
 from rest_framework.permissions import IsAuthenticated
 import os
 from openai import OpenAI
@@ -346,3 +347,112 @@ def tutor_recommend(request):
         ]
     }
     return Response(sample_links)
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def conversation_sets(request):
+    if request.method == 'GET':
+        sets = ConversationSet.objects.filter(user=request.user).order_by('-created_at')
+        return Response(ConversationSetSerializer(sets, many=True).data)
+    elif request.method == 'POST':
+        title = request.data.get('title') or f"Session on {timezone.now().strftime('%b %d, %Y')}"
+        serializer = ConversationSetSerializer(data={
+            'title': title,
+            'messages': request.data.get('messages', [])
+        })
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response({'message': 'Chat saved!'})
+        return Response(serializer.errors, status=400)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def generate_quiz(request):
+    source = request.data.get("source")
+    text = ""
+
+    print("⚡ Source:", source)
+
+    try:
+        if source == "notes":
+            note_id = request.data.get("note_id")
+            print("📝 Note ID:", note_id)
+            note = Note.objects.get(id=note_id, user=request.user)
+
+            if not note.file:
+                return Response({"error": "Note file not found."}, status=400)
+
+            try:
+                file_data = note.file.read()
+                if isinstance(file_data, bytes):
+                    text = file_data.decode()[:4000]
+                else:
+                    text = str(file_data)[:4000]
+            except Exception as e:
+                print("❌ Failed to read note file:", str(e))
+                return Response({"error": "Failed to read note file."}, status=500)
+
+        elif source == "flashcards":
+            set_id = request.data.get("set_id")
+            print("🧠 Flashcard Set ID:", set_id)
+            flashcards = Flashcard.objects.filter(set__id=set_id, set__user=request.user)
+
+            if not flashcards.exists():
+                return Response({"error": "Flashcard set not found or empty."}, status=400)
+
+            for fc in flashcards:
+                text += f"Q: {fc.question}\nA: {fc.answer}\n\n"
+
+        else:
+            return Response({"error": "Invalid quiz source selected."}, status=400)
+
+        if not text.strip():
+            return Response({"error": "No content found to generate questions."}, status=400)
+
+        print("📚 Extracted text length:", len(text))
+
+# ✨ New Improved Prompt
+        prompt = f"""
+Generate exactly 5 short-answer quiz questions based on the study material below.
+
+Each question must begin with "Q:" and each answer must begin with "A:".
+Use this format:
+
+Q: What is X?
+A: X is ...
+
+Q: What does Y mean?
+A: Y means ...
+
+Study Material:
+{text}
+"""
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+            max_tokens=800
+        )
+
+        raw = response.choices[0].message.content
+        print("✅ Raw LLM response received.")
+
+        questions = []
+        for chunk in raw.split("Q:"):
+            if "A:" not in chunk:
+                continue
+            try:
+                q, a = chunk.split("A:", 1)
+                questions.append({ "q": q.strip(), "a": a.strip() })
+            except Exception as e:
+                print("⚠️ Skipped malformed QA chunk:", chunk)
+
+
+        return Response({ "questions": questions })
+
+    except Note.DoesNotExist:
+        return Response({"error": "Note not found."}, status=404)
+    except Exception as e:
+        print("❌ Unhandled server error:", str(e))
+        return Response({"error": str(e)}, status=500)

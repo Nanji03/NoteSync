@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Note, ShareRequest, Flashcard, FlashcardSet, AITutorEntry
+from .models import Note, ShareRequest, Flashcard, FlashcardSet, AITutorEntry, ConversationSet
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,3 +28,10 @@ class AITutorEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = AITutorEntry
         fields = '__all__'
+
+        
+class ConversationSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConversationSet
+        fields = '__all__'
+        read_only_fields = ['user', 'created_at']

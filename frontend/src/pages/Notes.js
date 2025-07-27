@@ -95,9 +95,9 @@ export default function Notes() {
 
           <button
             type="submit"
-            className="bg-gtaGreen text-gtaBlack font-bold px-6 py-2 rounded shadow-gta hover:scale-105 transition-all"
+  className="bg-transparent border border-gtaAccent text-gtaAccent font-gta px-6 py-2 rounded shadow-gta hover:bg-gtaAccent hover:text-gtaBlack transition-all mb-6"
           >
-            ✅ Upload Note
+            Upload Note
           </button>
         </form>
 

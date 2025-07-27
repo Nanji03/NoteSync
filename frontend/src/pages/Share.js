@@ -39,12 +39,19 @@ const Share = ({ user, userNotes = [], userFlashcardSets = [] }) => {
       content_id: contentId,
     };
 
+    const token = localStorage.getItem("accessToken");
+if (!token) {
+  alert("🔐 You must be logged in to share content.");
+  return;
+}
+
+
     try {
       const res = await fetch("/api/share-request/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access")}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         body: JSON.stringify(payload),
       });
@@ -132,7 +139,7 @@ const Share = ({ user, userNotes = [], userFlashcardSets = [] }) => {
           type="submit"
   className="bg-transparent border border-gtaAccent text-gtaAccent font-gta px-6 py-2 rounded shadow-gta hover:bg-gtaAccent hover:text-gtaBlack transition-all mb-6"
         >
-          🚀 Send Share Request
+          Send Share Request
         </button>
       </form>
     </div>
