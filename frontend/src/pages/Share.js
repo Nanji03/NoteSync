@@ -40,11 +40,10 @@ const Share = ({ user, userNotes = [], userFlashcardSets = [] }) => {
     };
 
     const token = localStorage.getItem("accessToken");
-if (!token) {
-  alert("🔐 You must be logged in to share content.");
-  return;
-}
-
+    if (!token) {
+      alert("🔐 You must be logged in to share content.");
+      return;
+    }
 
     try {
       const res = await fetch("/api/share-request/", {
@@ -67,6 +66,20 @@ if (!token) {
   const getAvailableContent = () => {
     return contentType === "notes" ? userNotes : userFlashcardSets;
   };
+
+  // Defensive: If no user, block sharing UI and show message
+  if (!user || !user.username) {
+    return (
+      <div className="p-6 max-w-2xl mx-auto bg-gtaBlack text-gtaWhite rounded shadow-gta">
+        <h2 className="text-3xl font-gta text-gtaAccent mb-6">
+          📤 Share Content
+        </h2>
+        <div className="text-gtaRed font-bold">
+          You must be logged in to use sharing features.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-2xl mx-auto bg-gtaBlack text-gtaWhite rounded shadow-gta">
@@ -137,7 +150,7 @@ if (!token) {
 
         <button
           type="submit"
-  className="bg-transparent border border-gtaAccent text-gtaAccent font-gta px-6 py-2 rounded shadow-gta hover:bg-gtaAccent hover:text-gtaBlack transition-all mb-6"
+          className="bg-transparent border border-gtaAccent text-gtaAccent font-gta px-6 py-2 rounded shadow-gta hover:bg-gtaAccent hover:text-gtaBlack transition-all mb-6"
         >
           Send Share Request
         </button>

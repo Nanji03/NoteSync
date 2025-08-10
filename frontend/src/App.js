@@ -54,7 +54,14 @@ function InnerApp() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/flashcards" element={<Flashcards />} />
-          <Route path="/share" element={<Share />} />
+          <Route 
+  path="/share" 
+  element={
+    <Share 
+      user={{ username: localStorage.getItem('username') }} 
+    />
+  }
+/>
           <Route path="/planner" element={<Planner />} />
           <Route path="/incoming-requests" element={<IncomingRequests />} />
           <Route path="/accepted-shares" element={<AcceptedShares />} />

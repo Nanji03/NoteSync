@@ -27,6 +27,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class RegisterView(APIView):
     def post(self, request):
+        print(request.data) 
         data = request.data
         if User.objects.filter(username=data['username']).exists():
             return Response({'error': 'Username already exists'}, status=400)
