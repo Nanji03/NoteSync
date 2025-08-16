@@ -68,7 +68,7 @@ export default function Planner() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
         {/* Calendar */}
         <div>
-          <h1 className="text-3xl font-gta text-gtaGreen mb-4">📅 Mission Planner</h1>
+          <h1 className="text-3xl font-gta text-gtaAccent mb-4">📅 Mission Planner</h1>
           <Calendar
             onChange={setSelectedDate}
             value={selectedDate}

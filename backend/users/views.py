@@ -1,7 +1,6 @@
 from datetime import timezone
 from django.shortcuts import render
-
-# Create your views here.
+from django.http import FileResponse, Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -69,7 +68,6 @@ class NoteUploadView(APIView):
         notes = Note.objects.filter(user=request.user).order_by('-uploaded_at')
         serializer = NoteSerializer(notes, many=True)
         return Response(serializer.data)
-    
 
 class NoteDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -81,7 +79,50 @@ class NoteDetailView(APIView):
             return Response({'message': 'Note deleted'}, status=status.HTTP_204_NO_CONTENT)
         except Note.DoesNotExist:
             return Response({'error': 'Note not found'}, status=status.HTTP_404_NOT_FOUND)
-        
+    
+class NotesViewing(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            note = Note.objects.get(id=pk, user=request.user)
+            if not note.file:
+                return Response({'error': 'No file attached.'}, status=404)
+
+            # Detect content type (assuming files can be PDF, DOCX, TXT, etc.)
+            ext = note.file.name.split('.')[-1].lower()
+            content_type = "application/pdf"
+            if ext in ["doc", "docx"]:
+                content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            elif ext == "txt":
+                content_type = "text/plain"
+
+            # Serve inline preview
+            response = FileResponse(note.file.open("rb"), as_attachment=False, filename=note.file.name)
+            response["Content-Type"] = content_type
+            return response
+
+        except Note.DoesNotExist:
+            return Response({'error': 'Note not found'}, status=404)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+
+class NotesDownloading(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            note = Note.objects.get(id=pk, user=request.user)
+            if not note.file:
+                return Response({'error': 'No file attached.'}, status=404)
+            
+            # Force download (PDF or original extension)
+            response = FileResponse(note.file.open('rb'), as_attachment=True, filename=note.file.name)
+            return response
+        except Note.DoesNotExist:
+            return Response({'error': 'Note not found'}, status=404)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
 
 class GenerateFlashcardsView(APIView):
     permission_classes = [IsAuthenticated]
@@ -154,13 +195,13 @@ def share_request(request):
         return Response({"error": str(e)}, status=400)
     
     # 1. GET /api/incoming-requests/
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def incoming_requests(request):
     pending = ShareRequest.objects.filter(to_user=request.user, status='pending')
     serializer = ShareRequestSerializer(pending, many=True)
     return Response(serializer.data)
-
 
 # 2. POST /api/share-request/accept/
 @api_view(['POST'])
@@ -413,7 +454,7 @@ def generate_quiz(request):
 
         print("📚 Extracted text length:", len(text))
 
-# ✨ New Improved Prompt
+# Prompt
         prompt = f"""
 Generate exactly 5 short-answer quiz questions based on the study material below.
 

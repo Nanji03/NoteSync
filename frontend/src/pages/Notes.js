@@ -65,6 +65,47 @@ export default function Notes() {
     }
   };
 
+const handleDownload = async (noteId, title) => {
+  const token = localStorage.getItem('accessToken');
+  try {
+    const res = await axios.get(`http://localhost:8000/api/notes/${noteId}/download/`, {
+      headers: { Authorization: `Bearer ${token}` },
+      responseType: 'blob'  // important for binary files
+    });
+
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${title}.pdf`); 
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (err) {
+    alert('Download failed.');
+  }
+};
+
+const handleView = async (noteId) => {
+  const token = localStorage.getItem("accessToken");
+  try {
+    const res = await axios.get(`http://localhost:8000/api/notes/${noteId}/view/`, {
+      headers: { Authorization: `Bearer ${token}` },
+      responseType: "blob"
+    });
+
+    // Make blob with the correct MIME type
+    const file = new Blob([res.data], { type: "application/pdf" });
+    const fileURL = URL.createObjectURL(file);
+
+    // Open in new tab
+    window.open(fileURL, "_blank");
+  } catch (err) {
+    alert("Failed to view note.");
+  }
+};
+
+  
   return (
     <div className="min-h-screen p-8 bg-gtaBlack text-gtaWhite">
       <div className="max-w-3xl mx-auto">
@@ -107,15 +148,27 @@ export default function Notes() {
             <li key={note.id} className="bg-gtaBlack border border-gtaWhite/20 p-4 rounded-lg shadow-gta">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-lg font-bold text-gtaGreen">{note.title}</p>
-                  <a
-                    href={`http://localhost:8000${note.file}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-gtaAccent underline"
+                  <p className="text-lg font-bold text-gtaAccent">{note.title}</p>
+
+                </div>
+                <div>
+                  <button
+                    onClick={() => handleDownload(note.id, note.title)}
+                    className="bg-transparent border border-gtaAccent text-gtaAccent font-gta px-3 py-1 rounded shadow-gta hover:bg-gtaAccent hover:text-gtaBlack transition-all mb-6"
                   >
-                    🔍 View / Download
-                  </a>
+                    Download PDF
+                  </button>
+
+                </div>
+                <div>
+                  <button
+                    onClick={() => handleView(note.id)}
+                    className="bg-transparent border border-gtaAccent text-gtaAccent font-gta px-3 py-1 rounded shadow-gta hover:bg-gtaAccent hover:text-gtaBlack transition-all mb-6"
+                  >
+                  View
+                  </button>
+
+
                   <span className="text-xs text-gtaWhite/50 ml-2">
                     ({new Date(note.uploaded_at).toLocaleString()})
                   </span>

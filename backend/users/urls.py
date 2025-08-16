@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterView, LoginView, NoteUploadView, NoteDetailView, GenerateFlashcardsView, share_request, incoming_requests, respond_to_share_request, accepted_shares, save_flashcards, get_user_flashcards, get_flashcard_sets, delete_flashcard_set, current_user, all_users, tutor_ask, tutor_save, tutor_saved, tutor_delete, tutor_ask, tutor_save, tutor_saved, tutor_delete, tutor_recommend, conversation_sets, generate_quiz
+from .views import RegisterView, LoginView, NoteUploadView, NoteDetailView, GenerateFlashcardsView, share_request, incoming_requests, respond_to_share_request, accepted_shares, save_flashcards, get_user_flashcards, get_flashcard_sets, delete_flashcard_set, current_user, all_users, tutor_ask, tutor_save, tutor_saved, tutor_delete, tutor_ask, tutor_save, tutor_saved, tutor_delete, tutor_recommend, conversation_sets, generate_quiz, NotesViewing, NotesDownloading
 
 urlpatterns = [
     path('register/', RegisterView.as_view()),
@@ -24,4 +24,6 @@ urlpatterns = [
     path('tutor/recommend/', tutor_recommend, name='tutor-recommend'),
     path('tutor/conversations/', conversation_sets, name='conversation-sets'),
     path("quiz/generate/", generate_quiz, name = "generate-quiz"),
+    path('notes/<int:pk>/view/', NotesViewing.as_view()),
+    path('notes/<int:pk>/download/', NotesDownloading.as_view()),
 ]
