@@ -34,7 +34,6 @@ Built with **Django** (backend) and **React** (frontend), NoteSync offers tools 
 - **Backend:** Django, Django REST Framework  
 - **Database:** PostgreSQL (or SQLite for local development)  
 - **Authentication:** JWT / Django Allauth  
-- **Deployment (optional):** Render, Vercel, Netlify, or Heroku
 
 ---
 
@@ -55,4 +54,4 @@ source venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
->>>>>>> 60110a2 (Initial commit)
+
