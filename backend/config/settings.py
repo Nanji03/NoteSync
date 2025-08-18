@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "NoteSync-backend.onrender.com"]
+ALLOWED_HOSTS = ["localhost", "NoteSync-backend1.onrender.com"]
 
 # Application definition
 
